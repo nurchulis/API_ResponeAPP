@@ -1,5 +1,6 @@
 import os
 from flask_restful import Resource, reqparse
+from models import UserModel
 from flask import json, request
 from run import mysql
 from run import app
