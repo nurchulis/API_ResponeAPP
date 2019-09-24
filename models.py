@@ -9,7 +9,10 @@ class UserModel(db.Model):
     username = db.Column(db.String(25), unique = True, nullable = False)
     password = db.Column(db.String(25), nullable = False)
     email = db.Column(db.String(25), nullable = False)
-    
+    kantor = db.Column(db.String(30), nullable = False)
+    no_hp = db.Column(db.String(13), nullable = False)
+    alamat = db.Column(db.String(50), nullable = False)
+
     def save_to_db(self):
         db.session.add(self)
         db.session.commit()

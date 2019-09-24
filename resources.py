@@ -4,11 +4,17 @@ from models import UserModel, RevokedTokenModel
 from flask import json, request
 from run import mysql
 from run import app
+import requests
+import urllib3
+
+from flask import jsonify, make_response
 from werkzeug import secure_filename
 import random
 import string
 from flask_jwt_extended import (create_access_token, create_refresh_token, jwt_required, jwt_refresh_token_required, get_jwt_identity, get_raw_jwt)
 
+
+pool_manager = urllib3.PoolManager()
 register = reqparse.RequestParser()
 auth = reqparse.RequestParser()
 join = reqparse.RequestParser()
@@ -20,6 +26,10 @@ task_data = reqparse.RequestParser()
 register.add_argument('username', help = 'This field cannot be blank', required = True)
 register.add_argument('password', help = 'This field cannot be blank', required = True)
 register.add_argument('email', help= 'This field cannot be blank', required = True)
+register.add_argument('kantor', help= 'This field cannot be blank', required = True)
+register.add_argument('no_hp', help= 'This field cannot be blank', required = True)
+register.add_argument('alamat', help= 'This field cannot be blank', required = True)
+
 
 auth.add_argument('username', help = 'This field cannot be blank or use json body Parameter', location='json', required = True)
 auth.add_argument('password', help = 'This field cannot be blank or use json body Parameter', location='json', required = True)
@@ -29,14 +39,25 @@ join.add_argument('id_task', help='this field cannot be blank', location='json',
 join.add_argument('id_user', help='this field cannot be blank', location='json', required= True)
 join.add_argument('roles', help='this field cannot be blank', location='json', required= True)
 
-#Parser For Create Task
+#Parser For Create Respone
+task.add_argument('id_respone', help='this field cannot be blank', location='json', required= True)
 task.add_argument('id_user', help='this field cannot be blank', location='json', required= True)
-task.add_argument('description', help='this field cannot be blank', location='json', required= True)
-task.add_argument('name_location', help='this field cannot be blank', location='json', required= True)
+task.add_argument('alamat', help='this field cannot be blank', location='json', required= True)
+task.add_argument('sumber_respone', help='this field cannot be blank', location='json', required= True)
+task.add_argument('tgl', help='this field cannot be blank', location='json', required= True)
+task.add_argument('catatan', help='this field cannot be blank', location='json', required= True)
+task.add_argument('status', help='this field cannot be blank', location='json', required= True)
+task.add_argument('minat_lokasi', help='this field cannot be blank', location='json', required= True)
+task.add_argument('jadwal', help='this field cannot be blank', location='json', required= True)
 
-#parser For Edit Task
-edittask.add_argument('description', help='this field cannot be blank', location='json', required= True)
-edittask.add_argument('name_location', help='this field cannot be blank', location='json', required= True)
+#parser For Edit Respone
+edittask.add_argument('alamat', help='this field cannot be blank', location='json', required= True)
+edittask.add_argument('sumber_respone', help='this field cannot be blank', location='json', required= True)
+edittask.add_argument('tgl', help='this field cannot be blank', location='json', required= True)
+edittask.add_argument('catatan', help='this field cannot be blank', location='json', required= True)
+edittask.add_argument('status', help='this field cannot be blank', location='json', required= True)
+edittask.add_argument('minat_lokasi', help='this field cannot be blank', location='json', required= True)
+edittask.add_argument('jadwal', help='this field cannot be blank', location='json', required= True)
 
 file.add_argument('file[]', location=['headers', 'values'])
 
@@ -65,7 +86,10 @@ class UserRegistration(Resource):
         new_user = UserModel(
             username = data['username'],
             password = UserModel.generate_hash(data['password']),
-            email    = data['email']
+            email    = data['email'],
+            kantor   = data['kantor'],
+            no_hp    = data['no_hp'],
+            alamat   = data['alamat']
         )
 
         try:
@@ -202,29 +226,48 @@ class ShowTask(Resource):
         else:
             return json.dumps({'data':'null'})
 
+class DeleteRespone(Resource):
+    def get(self, id_respone=None):
+        conn = mysql.connect()
+        cursor = conn.cursor()
+        result = cursor.execute("DELETE FROM Respone WHERE id_respone = %s",int(id_respone))
+        conn.commit()
+        conn.close()
+        if(result):
+            return {'success':'true'}
+        else:
+            return {'success':'false'}
+
+
 class CreateTask(Resource):
     def post(self):
         data = task.parse_args()
         conn = mysql.connect()
         cursor = conn.cursor()
-        id_task=randomString()
+        id_respone=randomString()
         id_user=data['id_user']
         result = cursor.execute(
-        """INSERT INTO Task (
-                id_task,    
-                description,
-                name_location
+        """INSERT INTO Respone ( 
+                id_user,  
+                alamat,
+                sumber_respone,
+                tgl,
+                catatan,
+                status,
+                minat_lokasi,
+                jadwal
             ) 
-            VALUES (%s,%s,%s)""",(id_task,data['description'],data['name_location']))
+            VALUES (%s,%s,%s,%s,%s,%s,%s,%s)""",(id_user,data['alamat'],data['sumber_respone'],data['tgl'],data['catatan'],data['status'],data['minat_lokasi'],data['jadwal']))
         conn.commit()
         conn.close()
-        level='boss'
+        ##level='boss'
         if(result): 
-            return JoinTask_Create(id_task,id_user,level, data['description'], data['name_location'])
+            return {"success":"success"}
+            ##return JoinTask_Create(id_task,id_user,level, data['description'], data['name_location'])
         else:
             return {"success":"false"}
 
-def JoinTask_Create(id_task, id_user, level, descriptions, name_location):
+def JoinTask_Create(id_task, id_user, level, descriptions, name_location): 
         conn = mysql.connect()
         cursor = conn.cursor()
         cursor.execute(
@@ -245,12 +288,12 @@ def JoinTask_Create(id_task, id_user, level, descriptions, name_location):
                 }
 
 class UpdateTask(Resource):
-        def post(self, id_task=None):
+        def post(self, id_respone=None):
             data = edittask.parse_args()            
             conn = mysql.connect()
             cursor = conn.cursor()
-            result = cursor.execute("UPDATE Task SET description = %s, name_location = %s WHERE id_task = %s",
-                            (data['description'],data['name_location'],int(id_task)))
+            result = cursor.execute("UPDATE Respone SET alamat = %s, sumber_respone = %s, tgl = %s, catatan = %s, status = %s, minat_lokasi = %s, jadwal = %s WHERE id_respone = %s",
+                            (data['alamat'],data['sumber_respone'],data['tgl'],data['catatan'],data['status'],data['minat_lokasi'],data['jadwal'],int(id_respone)))
             conn.commit()
             conn.close()
             if(result):
@@ -258,57 +301,18 @@ class UpdateTask(Resource):
             else:
                 return {'success':'false'}
 
-class Uploadgambar(Resource):
-    def post(self):
-        # Get the name of the uplo
-        uploaded_files = request.files.getlist("file[]")
-        filenames = []
-        uniqe_name_data=randomString()
-        for file in uploaded_files:
-            # Check if the file is one of the allowed types/extensions
-            if file and allowed_file(file.filename):
-                # Make the filename safe, remove unsupported chars
-                filename = secure_filename(file.filename)
-                # Move the file form the temporal folder to the upload
-                # folder we setup
-                uniqe_name=randomFile()+filename
+class Apicuaca(Resource):
+        def get(self):
+            result = requests.get("http://dataservice.accuweather.com/locations/v1/cities/geoposition/search?apikey=z1nydrXnaR8Ai0uSwKLN192GjLzNsggI&q=-7.769025, 110.390743")
+            #URL=""
+            #key={'apikey':'z1nydrXnaR8Ai0uSwKLN192GjLzNsggI&q','q':'-7.769025, 110.390743'}
+            ##r = requests.get(url = URL)
+            #print(example_request.status) # Status code.
+            #print(example_request.headers["Content-Type"]) # Content type.
+            #ini = example_request.data
+            #print r.json
+            return result.json()
 
-                
-                insert(uniqe_name,uniqe_name_data)
-
-                file.save(os.path.join(app.config['UPLOAD_FOLDER'], uniqe_name))
-                # Save the filename into a list, we'll use it later
-                filenames.append(uniqe_name)
-                # Redirect the user to the uploaded_file route, which
-                # will basicaly show on the browser the uploaded file
-        # Load an html page with a link to each uploaded file
-        return {'success':'true'}
-
-
-class UploadgambarWithData(Resource):
-    def post(self, id_task=None):
-        # Get the name of the uplo
-        uploaded_files = request.files.getlist("file[]")
-        data =task_data.parse_args()
-        geolocation = data['geolocation']
-        keterangan =data['keterangan']
-        filenames = []
-        uniqe_name_data=randomString()
-        for file in uploaded_files:
-            if file and allowed_file(file.filename):
-                filename = secure_filename(file.filename)
-                
-                uniqe_name=randomFile()+filename                
-                
-                insert(uniqe_name,uniqe_name_data)
-                insert_data(int(id_task),geolocation,keterangan,uniqe_name_data)
-
-
-                file.save(os.path.join(app.config['UPLOAD_FOLDER'], uniqe_name))
-                filenames.append(uniqe_name)
-        return {'success':'true'}
-
-        
 
 def allowed_file(filename):
     return '.' in filename and \
