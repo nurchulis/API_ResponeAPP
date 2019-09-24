@@ -4,7 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask import json
 from flaskext.mysql import MySQL
 from flask_jwt_extended import JWTManager
-import views
+##import views
 
 app = Flask(__name__)
 app=Flask(__name__,template_folder='static')
@@ -38,7 +38,7 @@ mysql.init_app(app)
 
 db = SQLAlchemy(app) 
 
-import views, models, resources
+import  models, resources
 path_api ='/api/v1'
 
 
