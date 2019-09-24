@@ -58,6 +58,7 @@ def allowed_file(filename):
 @app.before_first_request
 def create_tables():
     db.create_all()
+    
 
 @jwt.expired_token_loader
 def my_expired_token_callback(expired_token):
@@ -81,7 +82,7 @@ api.add_resource(resources.GetUser,path_api+'/User/<int:id_user>')
 
 
 
-#Task
+#Respone
 api.add_resource(resources.JoinTask, path_api+'/JoinTask')
 api.add_resource(resources.ShowTask, path_api+'/ShowTask/<int:id_user>')
 api.add_resource(resources.CreateTask, path_api+'/CreateTask')
