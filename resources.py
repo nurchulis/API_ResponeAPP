@@ -41,7 +41,7 @@ join.add_argument('id_user', help='this field cannot be blank', location='json',
 join.add_argument('roles', help='this field cannot be blank', location='json', required= True)
 
 #Parser For Create Respone
-task.add_argument('id_respone', help='this field cannot be blank', location='json', required= True)
+#task.add_argument('id_respone', help='this field cannot be blank', location='json', required= True)
 task.add_argument('id_user', help='this field cannot be blank', location='json', required= True)
 task.add_argument('alamat', help='this field cannot be blank', location='json', required= True)
 task.add_argument('sumber_respone', help='this field cannot be blank', location='json', required= True)
