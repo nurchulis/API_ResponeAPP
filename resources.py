@@ -4,6 +4,7 @@ from models import UserModel
 from flask import json, request
 from run import mysql
 from run import app
+import datetime
 import requests
 import urllib3
 
@@ -51,6 +52,7 @@ task.add_argument('minat_lokasi', help='this field cannot be blank', location='j
 task.add_argument('jadwal', help='this field cannot be blank', location='json', required= True)
 
 #parser For Edit Respone
+edittask.add_argument('nama_konsument', help='this field cannot be blank', location='json', required= True)
 edittask.add_argument('alamat', help='this field cannot be blank', location='json', required= True)
 edittask.add_argument('sumber_respone', help='this field cannot be blank', location='json', required= True)
 edittask.add_argument('tgl', help='this field cannot be blank', location='json', required= True)
@@ -209,17 +211,19 @@ class ShowTask(Resource):
     def get(self, id_user=None):
         conn = mysql.connect()
         cursor = conn.cursor()
-        result = cursor.execute("SELECT Task.id_task, Join_task.id_user, Task.description, Join_task.roles FROM Join_task JOIN User JOIN Task WHERE Join_task.id_task=Task.id_task AND Join_task.id_user=User.id_user AND Join_task.id_user= %s ",int(id_user))
+        result = cursor.execute("SELECT * from Respone WHERE id_user= %s ",int(id_user))
         data = cursor.fetchall()
         results = []
         if(result):
             for item in data:
                 dataResponse = {
-                'id_task'     : item[0],
-                'id_user'     : item[1],
-                'descriptions'   : item[2],
-                'roles'  : item[3],
-            }
+                'id_respone'     : item[0],
+                'alamat'     : item[2],
+                'nama_konsumen': item[3],
+                'sumber_respone'   : item[4],
+                'catatan'  : item[6],
+                ##'tgl': datetime.datetime(item[4])
+           }
                 results.append(dataResponse)
             return ({'success':'true',
                     'data':results})
@@ -250,6 +254,7 @@ class CreateTask(Resource):
         """INSERT INTO Respone ( 
                 id_user,  
                 alamat,
+                nama_konsument,
                 sumber_respone,
                 tgl,
                 catatan,
@@ -257,7 +262,7 @@ class CreateTask(Resource):
                 minat_lokasi,
                 jadwal
             ) 
-            VALUES (%s,%s,%s,%s,%s,%s,%s,%s)""",(id_user,data['alamat'],data['sumber_respone'],data['tgl'],data['catatan'],data['status'],data['minat_lokasi'],data['jadwal']))
+            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)""",(id_user,data['alamat'],data['nama_konsument'],data['sumber_respone'],data['tgl'],data['catatan'],data['status'],data['minat_lokasi'],data['jadwal']))
         conn.commit()
         conn.close()
         ##level='boss'
@@ -292,8 +297,8 @@ class UpdateTask(Resource):
             data = edittask.parse_args()            
             conn = mysql.connect()
             cursor = conn.cursor()
-            result = cursor.execute("UPDATE Respone SET alamat = %s, sumber_respone = %s, tgl = %s, catatan = %s, status = %s, minat_lokasi = %s, jadwal = %s WHERE id_respone = %s",
-                            (data['alamat'],data['sumber_respone'],data['tgl'],data['catatan'],data['status'],data['minat_lokasi'],data['jadwal'],int(id_respone)))
+            result = cursor.execute("UPDATE Respone SET alamat = %s, nama_konsument = %s, sumber_respone = %s, tgl = %s, catatan = %s, status = %s, minat_lokasi = %s, jadwal = %s WHERE id_respone = %s",
+                            (data['alamat'],data['nama_konsument'],data['sumber_respone'],data['tgl'],data['catatan'],data['status'],data['minat_lokasi'],data['jadwal'],int(id_respone)))
             conn.commit()
             conn.close()
             if(result):

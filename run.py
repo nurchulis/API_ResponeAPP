@@ -25,16 +25,17 @@ def check_if_token_in_blacklist(decrypted_token):
     return models.RevokedTokenModel.is_jti_blacklisted(jti)
 
 #--------_For Sqlalchemy Tools------------#
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:root@localhost/ereport'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://bku1bcknOI:VxIuiKGwl8@remotemysql.com:3306/bku1bcknOI'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = 'asnaksw12i10201sask'
 
 #---------_For Mysql----------------------#
 # mysql_configuratoin
-app.config['MYSQL_DATABASE_HOST']       = 'localhost'
-app.config['MYSQL_DATABASE_USER']       = 'nurchulis'
-app.config['MYSQL_DATABASE_PASSWORD']   = 'lina@maulana'
-app.config['MYSQL_DATABASE_DB']         = 'ereport'
+app.config['MYSQL_DATABASE_HOST']       = 'remotemysql.com'
+app.config['MYSQL_DATABASE_PORT']       =  3306
+app.config['MYSQL_DATABASE_USER']       = 'bku1bcknOI'
+app.config['MYSQL_DATABASE_PASSWORD']   = 'VxIuiKGwl8'
+app.config['MYSQL_DATABASE_DB']         = 'bku1bcknOI'
 mysql.init_app(app)
 
 db = SQLAlchemy(app) 
@@ -45,7 +46,7 @@ path_api ='/api/v1'
 
 @app.route('/')
 def main_world():
-    return render_template('index.html')
+    return render_template('./index.html')
 
 # This is the path to the upload directory
 app.config['UPLOAD_FOLDER'] = 'uploads/'
@@ -86,8 +87,8 @@ api.add_resource(resources.Apicuaca,path_api+'/Apicuaca')
 
 
 #Respone
-api.add_resource(resources.JoinTask, path_api+'/JoinTask')
-api.add_resource(resources.ShowTask, path_api+'/ShowTask/<int:id_user>')
+#api.add_resource(resources.JoinTask, path_api+'/JoinTask')
+api.add_resource(resources.ShowTask, path_api+'/ShowRespone/<int:id_user>')
 api.add_resource(resources.CreateTask, path_api+'/CreateRespone')
 api.add_resource(resources.DeleteRespone, path_api+'/DeleteRespone/<int:id_respone>')
 api.add_resource(resources.UpdateTask, path_api+'/UpdateTask/<int:id_respone>')

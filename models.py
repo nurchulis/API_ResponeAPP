@@ -31,6 +31,9 @@ class UserModel(db.Model):
     		ambil=cls.query.filter_by(id_user = id_user).first()
     		return {'success':'true',
     				'id_user':ambil.id_user,
+                    'email':ambil.email,
+                    'alamat':ambil.alamat,
+                    'kantor':ambil.kantor,
     				'username':ambil.username}
     	except:
     		return {'success':'false'}
