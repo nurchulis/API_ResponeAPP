@@ -50,6 +50,8 @@ task.add_argument('catatan', help='this field cannot be blank', location='json',
 task.add_argument('status', help='this field cannot be blank', location='json', required= True)
 task.add_argument('minat_lokasi', help='this field cannot be blank', location='json', required= True)
 task.add_argument('jadwal', help='this field cannot be blank', location='json', required= True)
+task.add_argument('nama_konsument', help='this field cannot be blank', location='json', required= True)
+
 
 #parser For Edit Respone
 edittask.add_argument('nama_konsument', help='this field cannot be blank', location='json', required= True)
