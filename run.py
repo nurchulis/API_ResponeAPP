@@ -25,17 +25,16 @@ def check_if_token_in_blacklist(decrypted_token):
     return models.RevokedTokenModel.is_jti_blacklisted(jti)
 
 #--------_For Sqlalchemy Tools------------#
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://bku1bcknOI:VxIuiKGwl8@remotemysql.com:3306/bku1bcknOI'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:root@localhost/ereport'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = 'asnaksw12i10201sask'
 
 #---------_For Mysql----------------------#
 # mysql_configuratoin
-app.config['MYSQL_DATABASE_HOST']       = 'remotemysql.com'
-app.config['MYSQL_DATABASE_PORT']       =  3306
-app.config['MYSQL_DATABASE_USER']       = 'bku1bcknOI'
-app.config['MYSQL_DATABASE_PASSWORD']   = 'VxIuiKGwl8'
-app.config['MYSQL_DATABASE_DB']         = 'bku1bcknOI'
+app.config['MYSQL_DATABASE_HOST']       = 'localhost'
+app.config['MYSQL_DATABASE_USER']       = 'root'
+app.config['MYSQL_DATABASE_PASSWORD']   = 'root'
+app.config['MYSQL_DATABASE_DB']         = 'ereport'
 mysql.init_app(app)
 
 db = SQLAlchemy(app) 
