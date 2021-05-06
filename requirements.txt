@@ -8,7 +8,7 @@ cryptography==2.1.4
 DateTime==4.3
 enum34==1.1.6
 Flask==1.1.1
-Flask-Cors==3.0.8
+Flask-Cors==3.0.9
 Flask-JWT-Extended==3.23.0
 Flask-Mail==0.9.1
 Flask-MySQL==1.4.0
